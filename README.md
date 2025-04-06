@@ -1,6 +1,7 @@
 # Nodejs Chess Game
 
 A simple Node.js application demonstrating chess game in console
+This project is developed using node and typescript
 
 ## Features
 - Takes user input via console, with determined format
