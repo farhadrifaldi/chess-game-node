@@ -36,6 +36,8 @@ export abstract class Piece {
     this.player = player;
     this.type = type;
     this.board = board;
+    // set piece to the board
+    this.board.setPiece(this.coordinate, this);
   }
 
   /**
@@ -203,7 +205,6 @@ export class Bishop extends Piece {
 
     // if destination is occupied by ally, we can't move
     if (destination?.getPlayer() === this.player) return false;
-
     if (Math.abs(colDiff) === Math.abs(rowDiff)) {
       const colDirection = colDiff < 0 ? -1 : 1;
       const rowDirection = rowDiff < 0 ? -1 : 1;
