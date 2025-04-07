@@ -172,44 +172,44 @@ export class Game {
   }
 
   public main() {
-    let choice: string = "";
+    let input: string = "";
 
     this.setupPieces(this.board);
 
-    while (choice !== "exit" && !this.kingIsCaptured) {
+    while (input !== "exit" && !this.kingIsCaptured) {
       this.board.showBoard();
-      choice = readline.question(
+      input = readline.question(
         this.currentPlayer +
           " player! Choose start coordinate & end coordinate, with example format (a1 a2) (or 'exit' to quit): "
       );
 
-      if (choice === "exit") {
+      if (input === "exit") {
         break; // exit the loop
       }
 
-      if (!this.inputIsValid(choice)) {
+      if (!this.inputIsValid(input)) {
         console.log("Input is not valid");
         continue;
       }
 
-      if (!this.startCoordinateHasAPiece(choice)) {
+      if (!this.startCoordinateHasAPiece(input)) {
         console.log("The selected coordinate didn't have a piece");
         continue;
       }
 
-      if (!this.playerIsValidToMoveThePiece(choice)) {
+      if (!this.playerIsValidToMoveThePiece(input)) {
         console.log("The piece is not valid to be moved with current player");
         continue;
       }
 
-      const movePiece = this.movePiece(choice);
+      const movePiece = this.movePiece(input);
       if (!movePiece) {
         console.log(
           "The piece is not possible to move to the destination, please choose another destination"
         );
         continue;
       }
-      this.kingCapturedAfterPieceMoved(choice);
+      this.kingCapturedAfterPieceMoved(input);
 
       this.changePlayer();
     }
