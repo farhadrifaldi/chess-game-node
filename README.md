@@ -20,5 +20,9 @@ Run the application with:
 npm start
 ```
 
+Run application test with: 
+```bash
+npm test
+```
 ## License
 MIT
