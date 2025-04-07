@@ -128,39 +128,44 @@ export class Rook extends Piece {
   }
 
   canMove(to: PieceCoordinate): boolean {
+    // Can't move to same position
+    if (to.row === this.coordinate.row && to.col === this.coordinate.col) {
+      return false;
+    }
+
     const destination = this.board.getPiece(to);
 
     // if destination is occupied by ally, we can't move
     if (destination?.getPlayer() === this.player) return false;
 
-    // Move vertically
-    if (to.col === this.coordinate.col && to.row !== this.coordinate.row) {
-      const steps = to.row - this.coordinate.row;
-      const direction: number = steps > 0 ? 1 : -1;
-      // traverse to check if there any obstacle or not
-      for (let i = 1; i < Math.abs(steps); i++) {
-        const currentCoordinate = this.board.getPiece({
+    // Vertical movement
+    if (to.col === this.coordinate.col) {
+      const rowDiff = to.row - this.coordinate.row;
+      const direction = rowDiff > 0 ? 1 : -1;
+      for (let i = 1; i < Math.abs(rowDiff); i++) {
+        const currentPiece = this.board.getPiece({
           row: this.coordinate.row + i * direction,
           col: this.coordinate.col,
         });
-        if (currentCoordinate) return false;
-      }
-      return true;
-    } else if (
-      to.row === this.coordinate.row &&
-      to.col !== this.coordinate.col
-    ) {
-      const steps = to.col - this.coordinate.col;
-      const direction: number = steps > 0 ? 1 : -1;
-      for (let i = 1; i < Math.abs(steps); i++) {
-        const currentCoordinate = this.board.getPiece({
-          col: this.coordinate.col + i * direction,
-          row: this.coordinate.row,
-        });
-        if (currentCoordinate) return false;
+        if (currentPiece) return false;
       }
       return true;
     }
+
+    // Horizontal movement
+    if (to.row === this.coordinate.row) {
+      const colDiff = to.col - this.coordinate.col;
+      const direction = colDiff > 0 ? 1 : -1;
+      for (let i = 1; i < Math.abs(colDiff); i++) {
+        const currentPiece = this.board.getPiece({
+          row: this.coordinate.row,
+          col: this.coordinate.col + i * direction,
+        });
+        if (currentPiece) return false;
+      }
+      return true;
+    }
+
     return false;
   }
 }
@@ -176,13 +181,10 @@ export class Knight extends Piece {
     const xSteps = Math.abs(to.col - this.coordinate.col);
     const ySteps = Math.abs(to.row - this.coordinate.row);
 
-    if (
-      (xSteps === 2 && ySteps === 1) ||
-      (xSteps === 1 &&
-        ySteps === 2 &&
-        (destination?.getPlayer() !== this.player || !destination))
-    ) {
-      return true; // valid move
+    if ((xSteps === 2 && ySteps === 1) || (xSteps === 1 && ySteps === 2)) {
+      if (!destination || destination.getPlayer() !== this.player) {
+        return true;
+      }
     }
 
     return false;
@@ -195,27 +197,24 @@ export class Bishop extends Piece {
   }
 
   canMove(to: PieceCoordinate): boolean {
-    const xSteps = to.col - this.coordinate.col;
-    const ySteps = to.row - this.coordinate.row;
+    const colDiff = to.col - this.coordinate.col;
+    const rowDiff = to.row - this.coordinate.row;
     const destination = this.board.getPiece(to);
 
     // if destination is occupied by ally, we can't move
     if (destination?.getPlayer() === this.player) return false;
 
-    if (Math.abs(xSteps) === Math.abs(ySteps)) {
-      // define the direction of the move for x direction and y direction
-      const xDirection = xSteps < 0 ? -1 : 1;
-      const yDirection = ySteps < 0 ? -1 : 1;
+    if (Math.abs(colDiff) === Math.abs(rowDiff)) {
+      const colDirection = colDiff < 0 ? -1 : 1;
+      const rowDirection = rowDiff < 0 ? -1 : 1;
 
       // Check if there are any pieces in the way
-      for (let i = 1; i < Math.abs(xSteps); i++) {
-        for (let j = 0; j < Math.abs(ySteps); j++) {
-          const currentPiece = this.board.getPiece({
-            row: this.coordinate.row + i * yDirection,
-            col: this.coordinate.col + i * xDirection,
-          });
-          if (currentPiece) return false; // there is a piece in the way
-        }
+      for (let i = 1; i < Math.abs(colDiff); i++) {
+        const currentPiece = this.board.getPiece({
+          row: this.coordinate.row + i * rowDirection,
+          col: this.coordinate.col + i * colDirection,
+        });
+        if (currentPiece) return false;
       }
       return true;
     }
@@ -238,13 +237,12 @@ export class Queen extends Piece {
     // if destination is occupied by ally, we can't move
     if (destination?.getPlayer() === this.player) return false;
 
-    if (this.canMoveDiagonally(to)) return true;
-
-    if (this.canMoveHorizontally(to)) return true;
-
-    if (this.canMoveVertically(to)) return true;
-
-    return false;
+    // Check all possible movement directions
+    return (
+      this.canMoveDiagonally(to) ||
+      this.canMoveHorizontally(to) ||
+      this.canMoveVertically(to)
+    );
   }
 
   private canMoveHorizontally(to: PieceCoordinate): boolean {
