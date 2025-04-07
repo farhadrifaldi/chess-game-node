@@ -2,25 +2,39 @@ import { Piece, PieceCoordinate } from "./Piece";
 
 export class Board {
   private board: (Piece | null)[][];
+  private capturedPieces: Piece[];
 
   constructor() {
     this.board = Array(8)
       .fill(null)
       .map(() => Array(8).fill(null));
+    this.capturedPieces = [];
   }
 
   getPiece(to: { row: number; col: number }) {
     return this.board[to.row][to.col]; // return the piece at the given position
   }
 
+  getCapturedPieces() {
+    return this.capturedPieces;
+  }
+
   movePiece(to: { row: number; col: number }, piece: Piece) {
     const pieceCoordinate = piece.getCoordinate();
     this.board[pieceCoordinate.row][pieceCoordinate.col] = null;
+    this.capturePiece(to); // save the piece that already captured
     this.board[to.row][to.col] = piece;
     piece.setCoordinate({
       row: to.row,
       col: to.col,
     });
+  }
+
+  capturePiece(to: PieceCoordinate) {
+    const thePiece = this.getPiece(to);
+    if (thePiece) {
+      this.capturedPieces.push(thePiece);
+    }
   }
 
   showBoard() {
