@@ -1,3 +1,8 @@
+jest.mock("readline-sync", () => ({
+  __esModule: true,
+  question: jest.fn(),
+}));
+
 import { Board } from "../Board";
 import { Game } from "../Game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "../Piece";
@@ -134,11 +139,83 @@ describe("Game", () => {
   });
 
   describe("game flow", () => {
-    test.todo("should validate legal moves");
-    test.todo("should detect check");
-    test.todo("should detect checkmate");
-    test.todo("should handle castling");
-    test.todo("should handle en passant");
-    test.todo("should handle pawn promotion");
+    let mockQuestion: jest.Mock;
+
+    beforeEach(() => {
+      jest.resetAllMocks();
+      mockQuestion = (require("readline-sync") as any).question;
+      game = new Game(board);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("should run game loop until exit", () => {
+      // Setup initial board
+      game.setupPieces(board);
+
+      // Mock user input sequence
+      mockQuestion
+        .mockReturnValueOnce("a2 a3") // valid white move
+        .mockReturnValueOnce("a7 a6") // valid black move
+        .mockReturnValueOnce("exit"); // exit game
+
+      game.main();
+
+      expect(mockQuestion).toHaveBeenCalledTimes(3);
+    });
+
+    test("should handle invalid input", () => {
+      game.setupPieces(board);
+
+      mockQuestion
+        .mockReturnValueOnce("invalid") // invalid format
+        .mockReturnValueOnce("a9 a1") // invalid coordinates
+        .mockReturnValueOnce("a2 a3") // valid move
+        .mockReturnValueOnce("exit");
+
+      const consoleSpy = jest.spyOn(console, "log");
+      game.main();
+
+      expect(consoleSpy).toHaveBeenCalledWith("Input is not valid");
+      expect(mockQuestion).toHaveBeenCalledTimes(4);
+    });
+
+    test("should detect wrong player moving piece", () => {
+      new Pawn("white", { row: 1, col: 0 }, board); // a2
+      new Pawn("black", { row: 6, col: 0 }, board); // a7
+
+      mockQuestion
+        .mockReturnValueOnce("a7 a6") // black tries to move first (should fail)
+        .mockReturnValueOnce("a2 a3") // white moves
+        .mockReturnValueOnce("exit");
+
+      const consoleSpy = jest.spyOn(console, "log");
+      game.main();
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "The piece is not valid to be moved with current player"
+      );
+      expect(mockQuestion).toHaveBeenCalledTimes(3);
+    });
+
+    test("should end game when king is captured", () => {
+      // Setup board with kings in vulnerable positions
+      new King("black", { row: 0, col: 0 }, board); // a1
+      new Rook("white", { row: 0, col: 1 }, board); // b1
+
+      mockQuestion.mockReturnValueOnce("b1 a1"); // white rook captures black king
+
+      const consoleSpy = jest.spyOn(console, "log");
+
+      game.main();
+
+      // get secong console log
+      expect(consoleSpy.mock.calls[1][0]).toMatch(
+        /black player's King is Captured White player wins/
+      );
+      expect(mockQuestion).toHaveBeenCalledTimes(1);
+    });
   });
 });

@@ -1,4 +1,5 @@
 import * as readline from "readline-sync";
+
 import { Board } from "./Board";
 import {
   PieceCoordinate,
@@ -25,7 +26,7 @@ export class Game {
   }
 
   public getCurrentPlayer() {
-    return this.currentPlayer
+    return this.currentPlayer;
   }
 
   public parseCoordinate(input: string): {
@@ -174,7 +175,9 @@ export class Game {
   public main() {
     let input: string = "";
 
-    this.setupPieces(this.board);
+    // new King("black", { row: 0, col: 0 }, this.board); // a1
+    // new Rook("white", { row: 0, col: 1 }, this.board); // b1
+    // // this.setupPieces(this.board);
 
     while (input !== "exit" && !this.kingIsCaptured) {
       this.board.showBoard();
