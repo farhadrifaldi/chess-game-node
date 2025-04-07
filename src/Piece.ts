@@ -111,7 +111,7 @@ export class Pawn extends Piece {
     if (
       this.board.getPiece(to) && // destination should be occupied by opponent
       to.row === this.coordinate.row + direction && // move in direction of player
-      (to.col === this.coordinate.col + 1 || to.col === this.coordinate.row - 1) // capture diagonally
+      (to.col === this.coordinate.col + 1 || to.col === this.coordinate.col - 1) // capture diagonally
     ) {
       if (this.board.getPiece(to)?.getPlayer() !== this.player) return true; // check if opponent
     }
