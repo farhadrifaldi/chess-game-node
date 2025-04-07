@@ -1,6 +1,17 @@
 import * as readline from "readline-sync";
 import { Board } from "./Board";
-import { Piece, PieceCoordinate, PieceKey, Player } from "./Piece";
+import {
+  Bishop,
+  King,
+  Knight,
+  Pawn,
+  Piece,
+  PieceCoordinate,
+  PieceKey,
+  Player,
+  Queen,
+  Rook,
+} from "./Piece";
 
 function inputIsValid(input: string): boolean {
   const splittedStr = input.split(" ");
@@ -73,12 +84,102 @@ function playerIsValidToMoveThePiece(
   return false;
 }
 
+function setupPieces(board: Board) {
+  // SETUP PAWN PIECES WHITE & BLACK
+  for (let i = 0; i < board.getBoardArr().length; i++) {
+    board.setPiece(
+      { col: i, row: 1 },
+      new Pawn("white", { row: 1, col: i }, board)
+    );
+    board.setPiece(
+      { col: i, row: 6 },
+      new Pawn("black", { row: 6, col: i }, board)
+    );
+  }
+
+  // ROOK
+  board.setPiece(
+    { col: 0, row: 0 },
+    new Rook("white", { row: 0, col: 0 }, board)
+  );
+  board.setPiece(
+    { col: 7, row: 0 },
+    new Rook("white", { row: 0, col: 7 }, board)
+  );
+  board.setPiece(
+    { col: 0, row: 7 },
+    new Rook("black", { row: 7, col: 0 }, board)
+  );
+  board.setPiece(
+    { col: 7, row: 7 },
+    new Rook("black", { row: 7, col: 7 }, board)
+  );
+
+  // KNIGHT
+  board.setPiece(
+    { row: 0, col: 1 },
+    new Knight("white", { row: 0, col: 1 }, board)
+  );
+  board.setPiece(
+    { row: 0, col: 6 },
+    new Knight("white", { row: 0, col: 6 }, board)
+  );
+  board.setPiece(
+    { row: 7, col: 1 },
+    new Knight("black", { row: 7, col: 1 }, board)
+  );
+  board.setPiece(
+    { row: 7, col: 6 },
+    new Knight("black", { row: 7, col: 6 }, board)
+  );
+
+  // BISHOP
+  board.setPiece(
+    { row: 0, col: 2 },
+    new Bishop("white", { row: 0, col: 2 }, board)
+  );
+  board.setPiece(
+    { row: 0, col: 5 },
+    new Bishop("white", { row: 0, col: 5 }, board)
+  );
+  board.setPiece(
+    { row: 7, col: 2 },
+    new Bishop("black", { row: 7, col: 2 }, board)
+  );
+  board.setPiece(
+    { row: 7, col: 5 },
+    new Bishop("black", { row: 7, col: 5 }, board)
+  );
+
+  // QUEEN
+  board.setPiece(
+    { row: 0, col: 3 },
+    new Queen("white", { row: 0, col: 3 }, board)
+  );
+  board.setPiece(
+    { row: 7, col: 4 },
+    new Queen("black", { row: 7, col: 4 }, board)
+  );
+
+  // KING
+  board.setPiece(
+    { row: 0, col: 4 },
+    new King("white", { row: 0, col: 4 }, board)
+  );
+  board.setPiece(
+    { row: 7, col: 3 },
+    new King("black", { row: 7, col: 3 }, board)
+  );
+}
+
 function main() {
   let player: Player = "white";
   let choice: string = "";
   let kingIsCaptured = false;
 
   const board = new Board();
+
+  setupPieces(board);
 
   while (choice !== "exit" && !kingIsCaptured) {
     board.showBoard();
