@@ -179,3 +179,11 @@ function main() {
 }
 
 main();
+
+export {
+  inputIsValid,
+  parseCoordinate,
+  changePlayer,
+  playerIsValidToMoveThePiece,
+  setupPieces
+};
